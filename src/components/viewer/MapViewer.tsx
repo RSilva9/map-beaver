@@ -25,7 +25,7 @@ export default function MapViewer(){
     }, [imageKey])
 
     return(
-        <div className="relative inline-block">
+        <div className="relative inline-block select-none">
             <img src={imageURL} />
             <ZoneDrawer />
         </div>

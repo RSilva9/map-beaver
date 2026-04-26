@@ -4,6 +4,7 @@ import useMapStore from "./hooks/useMapStore";
 import { loadProject } from "./lib/db";
 import MapUploader from "./components/editor/MapUploader";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ZoneDrawer from "./components/editor/ZoneDrawer";
 
 function App(){
   const setProject = useMapStore(state => state.setProject);
