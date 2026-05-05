@@ -12,10 +12,11 @@ export default function ImageUploader(){
     const addMap = useMapStore(state => state.addMap);
     const setCurrentMapId = useMapStore(state => state.setCurrentMapId);
 
-    const addNewMap = async()=>{
+    const createMap = async() => {
         const mapKey = `map_${Date.now()}`;
         const imageKey = `img_${Date.now()}`;
         await saveImage(imageKey, file);
+
         const newMap: MapData = {
             id: mapKey,
             name: mapName,
@@ -23,6 +24,7 @@ export default function ImageUploader(){
             parentMapId: parentMap,
             zones: []
         }
+        
         const updatedProject: MapProject = {
             ...project,
             ...(isRoot && { rootMapId: newMap.id }),
@@ -72,7 +74,7 @@ export default function ImageUploader(){
                     }
                 </select>
             </div>
-            <button onClick={addNewMap}>Confirm</button>
+            <button onClick={createMap}>Confirm</button>
         </>
     )
 }
