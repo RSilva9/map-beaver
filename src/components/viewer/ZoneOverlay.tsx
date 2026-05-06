@@ -37,7 +37,7 @@ export default function ZoneOverlay({ children }: ZoneDrawerProps) {
                                 className="opacity-35 hover:opacity-100"
                                 onClick={() => setCurrentMapId(region.linkedMapId)}
                             />
-                            {
+                            {/* {
                                 region.points.map((circ, j) => (
                                     <circle
                                         key={j}
@@ -47,7 +47,7 @@ export default function ZoneOverlay({ children }: ZoneDrawerProps) {
                                         className="opacity-35 hover:opacity-100 cursor-pointer"
                                     />
                                 ))
-                            }
+                            } */}
                         </>
                     ))
                 }

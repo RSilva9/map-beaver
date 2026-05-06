@@ -1,6 +1,7 @@
 export interface Zone {
     id: string
-    label: string
+    label: string,
+    description: string,
     points: [number, number][]
     linkedMapId: string | null
     style: ZoneStyle
