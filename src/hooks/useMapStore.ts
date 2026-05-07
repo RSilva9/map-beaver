@@ -16,6 +16,7 @@ type MapStoreActions = {
     addMap: (map: MapData) => void
     addZone: (zone: Zone, mapId: string) => void
     updateZone: (zone: Zone, zoneId: string, mapId: string) => void
+    updateMapImage: (imageKey: string, newMapKey: string, mapId: string) => void
 };
 
 type MapStore = MapStoreState & MapStoreActions;
@@ -61,7 +62,23 @@ const useMapStore = create<MapStore>()((set, get) => ({
                 ) ?? []
             }
         }
-    }}))
+    }})),
+    updateMapImage: (newImageKey, newMapKey, mapId) => set((state) => {
+        const { [mapId]: oldMap, ...otherMaps } = state.project?.maps || {};
+        return {
+            project: {
+                ...state.project,
+                maps: {
+                    ...otherMaps,
+                    [newMapKey]: {
+                        ...oldMap,
+                        id: newMapKey,
+                        imageKey: newImageKey
+                    }
+                }
+            }
+        };
+    })
 }));
 
 export default useMapStore;

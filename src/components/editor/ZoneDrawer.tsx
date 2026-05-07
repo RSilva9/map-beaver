@@ -18,6 +18,7 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
     const currentMapId = useMapStore(state => state.currentMapId);
     const existingRegions = useMapStore(state => state.project?.maps[currentMapId].zones);
     const project = useMapStore(state => state.project);
+    const updateMapImage = useMapStore(state => state.updateMapImage);
     const save = useMapStore(state => state.save);
 
     const svgRef = useRef<SVGSVGElement>(null);
@@ -97,6 +98,7 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
     }
 
     const editZone = async(zone: Zone) => {
+        console.log(zone)
         const { value: formData } = await Swal.fire({
             title: "Edit region",
             html: `
@@ -125,11 +127,20 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
         });
 
         if(formData){
+            var mapKey: string;
+            if(formData.file){
+                const now = Date.now();
+                mapKey = `map_${now}`
+                const imageKey = `img_${now}`
+
+                updateMapImage(imageKey, mapKey, zone.linkedMapId);
+                saveImage(imageKey, formData.file);
+            }
             const updatedZone: Zone = {
                 ...zone,
                 label: formData.name,
                 description: formData.desc,
-                linkedMapId: formData.file != undefined ? `map_${Date.now()}` : zone.linkedMapId
+                linkedMapId: formData.file != undefined ? mapKey : zone.linkedMapId
             }
 
             updateZone(updatedZone, zone.id, currentMapId);
@@ -176,7 +187,7 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
             <svg
                 className="absolute top-0 left-0 w-full h-full select-none"
                 ref={svgRef}
-                // onClick={(e) => { if(e.detail === 1) drawPoint(e) }}
+                onClick={(e) => { if(e.detail === 1) drawPoint(e) }}
                 viewBox="0 0 1 1"
                 preserveAspectRatio="none"
                 onMouseMove={(e) => updateCirclePosition(e)}
