@@ -71,20 +71,36 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
         const { value: formData } = await Swal.fire({
             title: "Create new region",
             html: `
-                <div class="text-left">
-                    <label>Region Name:</label>
-                    <input type="text" id="regionName" class="swal2-input" placeholder="Enter region name">
-                    <label>Description:</label>
-                    <input type="text" id="regionDesc" class="swal2-input" placeholder="Enter description">
-                    <label>Map Image:</label>
-                    <input type="file" id="regionFile" class="swal2-input" accept="image/*">
+                <div class="flex-col">
+                    <div class="flex justify-start text-left my-5">
+                        <label class="me-5">Region Name:</label>
+                        <input type="text" id="regionName">
+                    </div>
+                    <div class="flex justify-start text-left my-5">
+                        <label class="w-25 me-5">Description:</label>
+                        <textarea id="regionDesc" class="w-75"></textarea>
+                    </div>
+                    <div class="flex justify-start text-left my-5">
+                        <label class="w-25 me-5">Region color:</label>
+                        <input type="color" id="regionColor" colorspace="display-p3"/>
+                    </div>
+                    <div class="flex justify-start text-left my-5">
+                        <label class="w-25 me-5">Region opacity:</label>
+                        <input type="range" id="regionOpacity" min="0" max="100"/>
+                    </div>
+                    <div class="flex justify-start text-left my-5">
+                        <label class="me-5">Map Image:</label>
+                    </div>
+                    <input type="file" id="regionFile" accept="image/*">
                 </div>
             `,
             preConfirm: () => {
                 const name = (document.getElementById('regionName') as HTMLInputElement).value;
-                const desc = (document.getElementById('regionDesc') as HTMLInputElement).value;
+                const desc = (document.getElementById('regionDesc') as HTMLTextAreaElement).value;
+                const color = (document.getElementById('regionColor') as HTMLInputElement).value;
+                const opacity = (document.getElementById('regionOpacity') as HTMLInputElement).value;
                 const file = (document.getElementById('regionFile') as HTMLInputElement).files?.[0];
-                return { name, desc, file };
+                return { name, desc, color, opacity, file };
             },
             
         });
@@ -112,6 +128,14 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
                         <textarea id="regionDesc" class="w-75">${zone.description}</textarea>
                     </div>
                     <div class="flex justify-start text-left my-5">
+                        <label class="w-25 me-5">Region color:</label>
+                        <input type="color" id="regionColor" colorspace="display-p3" value="${zone.style.fill}"/>
+                    </div>
+                    <div class="flex justify-start text-left my-5">
+                        <label class="w-25 me-5">Region opacity:</label>
+                        <input type="range" id="regionOpacity" min="0" max="100" value="${zone.style.opacity * 100}"/>
+                    </div>
+                    <div class="flex justify-start text-left my-5">
                         <label class="me-5">Map Image:</label>
                         <img src=${URL.createObjectURL(await loadImage(project.maps[zone.linkedMapId].imageKey))} class="w-[25%]"/>
                     </div>
@@ -121,8 +145,10 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
             preConfirm: () => {
                 const name = (document.getElementById('regionName') as HTMLInputElement).value;
                 const desc = (document.getElementById('regionDesc') as HTMLTextAreaElement).value;
+                const color = (document.getElementById('regionColor') as HTMLInputElement).value;
+                const opacity = (document.getElementById('regionOpacity') as HTMLInputElement).value;
                 const file = (document.getElementById('regionFile') as HTMLInputElement).files?.[0];
-                return { name, desc, file };
+                return { name, desc, color, opacity, file };
             },
         });
 
@@ -140,7 +166,11 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
                 ...zone,
                 label: formData.name,
                 description: formData.desc,
-                linkedMapId: formData.file != undefined ? mapKey : zone.linkedMapId
+                linkedMapId: formData.file != undefined ? mapKey : zone.linkedMapId,
+                style: {
+                    fill: formData.color,
+                    opacity: formData.opacity / 100
+                }
             }
 
             updateZone(updatedZone, zone.id, currentMapId);
@@ -169,8 +199,8 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
             points: currentPoints,
             linkedMapId: mapKey,
             style: {
-                fill: "white",
-                opacity: 100
+                fill: formData.color,
+                opacity: formData.opacity
             }
         }
 
@@ -199,10 +229,12 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
                             <polygon
                                 key={i}
                                 points={region.points.map(([x, y]) => `${x},${y}`).join(' ')}
-                                fill="#ffffff34"
+                                fill={region.style.fill}
+                                opacity={region.style.opacity}
                                 stroke="white"
                                 strokeWidth={0.003}
-                                className="opacity-35 hover:opacity-100"
+                                style={{ transition: 'opacity 0.1s' }}
+                                className="hover:opacity-50"
                                 onContextMenu={e =>{
                                     e.preventDefault();
                                     editZone(region);

@@ -31,10 +31,13 @@ export default function ZoneOverlay({ children }: ZoneDrawerProps) {
                             <polygon
                                 key={i}
                                 points={region.points.map(([x, y]) => `${x},${y}`).join(' ')}
-                                fill="#ffffff34"
+                                fill={region.style.fill}
+                                fillOpacity={region.style.opacity}
+                                opacity={region.style.opacity}
                                 stroke="white"
                                 strokeWidth={0.003}
-                                className="opacity-35 hover:opacity-100"
+                                style={{ transition: 'opacity 0.1s' }}
+                                className="hover:opacity-50"
                                 onClick={() => setCurrentMapId(region.linkedMapId)}
                             />
                             {/* {
