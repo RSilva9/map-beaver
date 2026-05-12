@@ -1,7 +1,5 @@
 export interface Zone {
     id: string
-    label: string,
-    description: string,
     points: [number, number][]
     linkedMapId: string | null
     style: ZoneStyle
@@ -15,6 +13,7 @@ export interface ZoneStyle {
 export interface MapData {
     id: string
     name: string
+    description: string
     imageKey: string
     parentMapId: string | null
     zones: Zone[]

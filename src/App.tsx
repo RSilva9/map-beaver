@@ -4,7 +4,8 @@ import useMapStore from "./hooks/useMapStore";
 import { loadProject } from "./lib/db";
 import MapUploader from "./components/editor/MapUploader";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import ZoneDrawer from "./components/editor/ZoneDrawer";
+import MapGallery from "./components/viewer/MapGallery";
+import Navbar from "./components/ui/Navbar";
 
 function App(){
   const setProject = useMapStore(state => state.setProject);
@@ -24,6 +25,7 @@ function App(){
 
   return (
     <BrowserRouter>
+      <Navbar/>
       <Routes>
         <Route path="/" element={
           <>
@@ -40,6 +42,12 @@ function App(){
           <>
             <h1 className="text-[100px]">MAP UPLOADER!</h1>
             <MapUploader />
+          </>
+        }/>
+        <Route path="/gallery" element={
+          <>
+            <h1 className="text-[100px]">MAP GALLERY!</h1>
+              <MapGallery />
           </>
         }/>
       </Routes>    

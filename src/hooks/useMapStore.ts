@@ -14,8 +14,10 @@ type MapStoreActions = {
     setProject: (project: MapProject) => void
     save: () => Promise<void>
     addMap: (map: MapData) => void
+    updateMap: (map: MapData) => void
     addZone: (zone: Zone, mapId: string) => void
     updateZone: (zone: Zone, zoneId: string, mapId: string) => void
+    deleteZone: (zoneId: string, mapId: string) => void
     updateMapImage: (imageKey: string, newMapKey: string, mapId: string) => void
 };
 
@@ -41,6 +43,13 @@ const useMapStore = create<MapStore>()((set, get) => ({
             }
         }
     })),
+    updateMap: (map) => set((state) => ({project: {
+        ...state.project,
+        maps: {
+            ...state.project?.maps,
+            [map.id]: map
+        }
+    }})),
     addZone: (zone, mapId) => set((state) => ({project: {
         ...state.project,
         maps: {
@@ -60,6 +69,16 @@ const useMapStore = create<MapStore>()((set, get) => ({
                 zones: state.project?.maps?.[mapId]?.zones.map((existingZone) =>
                     existingZone.id === zoneId ? { ...existingZone, ...zone } : existingZone
                 ) ?? []
+            }
+        }
+    }})),
+    deleteZone: (zoneId, mapId) => set((state) => ({project: {
+        ...state.project,
+        maps: {
+            ...state.project?.maps,
+            [mapId]: {
+                ...state.project?.maps?.[mapId],
+                zones: state.project?.maps?.[mapId].zones.filter(z => z.id !== zoneId)
             }
         }
     }})),

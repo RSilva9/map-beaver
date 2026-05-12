@@ -8,6 +8,7 @@ export default function ImageUploader(){
     const [isRoot, setIsRoot] = useState(false);
     const [parentMap, setParentMap] = useState(null);
     const [mapName, setMapName] = useState("");
+    const [mapDescription, setMapDescription] = useState("");
     const project = useMapStore(state => state.project);
     const addMap = useMapStore(state => state.addMap);
     const setCurrentMapId = useMapStore(state => state.setCurrentMapId);
@@ -20,6 +21,7 @@ export default function ImageUploader(){
         const newMap: MapData = {
             id: mapKey,
             name: mapName,
+            description: mapDescription,
             imageKey,
             parentMapId: parentMap,
             zones: []
@@ -53,6 +55,13 @@ export default function ImageUploader(){
                 <input 
                     type="text" 
                     onChange={e => setMapName(e.target.value)}
+                />
+            </div>
+            <div className="flex p-5">
+                <h1 className="me-15">Map description:</h1>
+                <input 
+                    type="text" 
+                    onChange={e => setMapDescription(e.target.value)}
                 />
             </div>
             <div className="flex p-5">

@@ -15,10 +15,12 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
     const addMap = useMapStore(state => state.addMap);
     const addZone = useMapStore(state => state.addZone);
     const updateZone = useMapStore(state => state.updateZone);
+    const deleteZone = useMapStore(state => state.deleteZone);
     const currentMapId = useMapStore(state => state.currentMapId);
     const existingRegions = useMapStore(state => state.project?.maps[currentMapId].zones);
     const project = useMapStore(state => state.project);
     const updateMapImage = useMapStore(state => state.updateMapImage);
+    const updateMap = useMapStore(state => state.updateMap);
     const save = useMapStore(state => state.save);
 
     const svgRef = useRef<SVGSVGElement>(null);
@@ -114,18 +116,19 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
     }
 
     const editZone = async(zone: Zone) => {
-        console.log(zone)
+        const zoneMap = project.maps[zone.linkedMapId];
+
         const { value: formData } = await Swal.fire({
             title: "Edit region",
             html: `
                 <div class="flex-col">
                     <div class="flex justify-start text-left my-5">
                         <label class="me-5">Region Name:</label>
-                        <input type="text" id="regionName" value="${zone.label}">
+                        <input type="text" id="regionName" value="${zoneMap.name}">
                     </div>
                     <div class="flex justify-start text-left my-5">
                         <label class="w-25 me-5">Description:</label>
-                        <textarea id="regionDesc" class="w-75">${zone.description}</textarea>
+                        <textarea id="regionDesc" class="w-75">${zoneMap.description}</textarea>
                     </div>
                     <div class="flex justify-start text-left my-5">
                         <label class="w-25 me-5">Region color:</label>
@@ -140,6 +143,9 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
                         <img src=${URL.createObjectURL(await loadImage(project.maps[zone.linkedMapId].imageKey))} class="w-[25%]"/>
                     </div>
                     <input type="file" id="regionFile" accept="image/*">
+                    <button id="deleteZoneBtn" style="margin-top: 10px; padding: 8px 16px; background-color: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Delete Region
+                    </button>
                 </div>
             `,
             preConfirm: () => {
@@ -149,6 +155,16 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
                 const opacity = (document.getElementById('regionOpacity') as HTMLInputElement).value;
                 const file = (document.getElementById('regionFile') as HTMLInputElement).files?.[0];
                 return { name, desc, color, opacity, file };
+            },
+            didOpen: () => {
+                const deleteBtn = document.getElementById('deleteZoneBtn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', async () => {
+                        deleteZone(zone.id, currentMapId);
+                        await save();
+                        Swal.close();
+                    });
+                }
             },
         });
 
@@ -164,16 +180,20 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
             }
             const updatedZone: Zone = {
                 ...zone,
-                label: formData.name,
-                description: formData.desc,
                 linkedMapId: formData.file != undefined ? mapKey : zone.linkedMapId,
                 style: {
                     fill: formData.color,
                     opacity: formData.opacity / 100
                 }
             }
+            const updatedMap: MapData = {
+                ...project.maps[zone.linkedMapId],
+                name: formData.name,
+                description: formData.desc
+            }
 
             updateZone(updatedZone, zone.id, currentMapId);
+            updateMap(updatedMap);
 
             await save();
         }
@@ -188,19 +208,18 @@ export default function ZoneDrawer({ children }: ZoneDrawerProps) {
         const newMap: MapData = {
             id: mapKey,
             name: formData.name,
+            description: formData.desc,
             imageKey,
             parentMapId: currentMapId,
             zones: []
         };
         const newZone: Zone = {
             id: zoneKey,
-            label: formData.name,
-            description: formData.desc,
             points: currentPoints,
             linkedMapId: mapKey,
             style: {
                 fill: formData.color,
-                opacity: formData.opacity
+                opacity: formData.opacity / 100
             }
         }
 

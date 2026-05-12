@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+.customButton{
+    border: solid black 1px;
+    text-align: center;
+    box-shadow: 5px 2px 2px black;
+    cursor: pointer;
+}
